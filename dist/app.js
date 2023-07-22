@@ -5,8 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const axios_1 = __importDefault(require("axios"));
+const node_html_parser_1 = __importDefault(require("node-html-parser"));
+const utils_1 = require("./utils");
 const m3u8Parser = require("m3u8-parser");
 const app = (0, express_1.default)();
+/* @deprecated */
 async function parseVkPlaylists(playerUrl) {
     const res = await axios_1.default.get(playerUrl);
     return res.data.split(",").reduce((acc, el) => {
@@ -33,6 +36,25 @@ async function parseSovetRomanticaPlaylists(playlistUrl) {
             .join("/")}/${uri}`,
     }), {});
 }
+async function parseOkPlaylists(playerUrl) {
+    const res = await axios_1.default.get(playerUrl);
+    const doc = (0, node_html_parser_1.default)(res.data);
+    try {
+        const links = JSON.parse(JSON.parse(doc
+            .querySelector('[data-module="OKVideo"]')
+            ?.getAttribute("data-options")).flashvars.metadata).videos;
+        return links
+            .map(({ name, url }) => ({
+            quality: (0, utils_1.getResByOkQualityName)(name),
+            url,
+        }))
+            .reverse();
+    }
+    catch (e) {
+        return [];
+    }
+}
+// Not used in App anymore
 app.get("/api/anime/vk-videos", async (req, res) => {
     return res.json({
         response: {
@@ -47,5 +69,10 @@ app.get("/api/anime/vk-videos", async (req, res) => {
 app.get("/api/anime/sovetromantica-videos", async (req, res) => {
     const parsed = await parseSovetRomanticaPlaylists(req.query.playlistUrl);
     return res.json(parsed);
+});
+app.get("/api/anime/ok-videos", async (req, res) => {
+    return res.json({
+        tracks: await parseOkPlaylists(req.query.playerUrl),
+    });
 });
 app.listen(8080);
