@@ -36,6 +36,7 @@ async function parseSovetRomanticaPlaylists(playlistUrl) {
             .join("/")}/${uri}`,
     }), {});
 }
+/* @deprecated */
 async function parseOkPlaylists(playerUrl) {
     const res = await axios_1.default.get(playerUrl);
     const doc = (0, node_html_parser_1.default)(res.data);
@@ -70,6 +71,7 @@ app.get("/api/anime/sovetromantica-videos", async (req, res) => {
     const parsed = await parseSovetRomanticaPlaylists(req.query.playlistUrl);
     return res.json(parsed);
 });
+// Not used in App anymore
 app.get("/api/anime/ok-videos", async (req, res) => {
     return res.json({
         tracks: await parseOkPlaylists(req.query.playerUrl),
