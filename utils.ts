@@ -1,3 +1,5 @@
+const m3u8Parser = require("m3u8-parser");
+
 type OkQuality = "mobile" | "lowest" | "low" | "sd" | "hd" | "full";
 type ResQuality = "144" | "240" | "360" | "480" | "720" | "1080";
 
@@ -14,4 +16,43 @@ const OkResQuality: OkResQualityMap = {
 
 export function getResByOkQualityName(okQuality: OkQuality): ResQuality {
   return OkResQuality[okQuality];
+}
+
+export function createPlaylistUrl(
+  masterPlaylistUrl: string,
+  fragmentUri: string,
+) {
+  const url = new URL(masterPlaylistUrl);
+  url.pathname = url.pathname
+    .split("/")
+    .slice(0, -1)
+    .concat(fragmentUri)
+    .join("/");
+
+  return url.href;
+}
+
+export function getPlaylistsFromManifest(
+  manifest: any,
+  masterPlaylistUrl: string,
+) {
+  try {
+    return (
+      manifest?.playlists?.map(({ attributes, uri }) => ({
+        quality: attributes.RESOLUTION.height.toString(),
+        url: createPlaylistUrl(masterPlaylistUrl, uri),
+      })) || []
+    );
+  } catch (e) {
+    return [];
+  }
+}
+
+export function getPlaylistManifest(masterPlaylistData: string) {
+  const parser = new m3u8Parser.Parser();
+
+  parser.push(masterPlaylistData);
+  parser.end();
+
+  return parser.manifest;
 }
