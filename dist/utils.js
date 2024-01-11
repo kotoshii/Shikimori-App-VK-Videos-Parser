@@ -27,7 +27,7 @@ exports.createPlaylistUrl = createPlaylistUrl;
 function getPlaylistsFromManifest(manifest, masterPlaylistUrl) {
     return (manifest?.playlists?.map(({ attributes, uri }) => ({
         quality: attributes.RESOLUTION.height.toString(),
-        url: createPlaylistUrl(masterPlaylistUrl, uri),
+        url: masterPlaylistUrl ? createPlaylistUrl(masterPlaylistUrl, uri) : uri,
     })) || []);
 }
 exports.getPlaylistsFromManifest = getPlaylistsFromManifest;

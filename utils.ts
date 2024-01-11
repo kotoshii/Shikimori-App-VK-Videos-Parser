@@ -34,12 +34,12 @@ export function createPlaylistUrl(
 
 export function getPlaylistsFromManifest(
   manifest: any,
-  masterPlaylistUrl: string,
+  masterPlaylistUrl?: string,
 ) {
   return (
     manifest?.playlists?.map(({ attributes, uri }) => ({
       quality: attributes.RESOLUTION.height.toString(),
-      url: createPlaylistUrl(masterPlaylistUrl, uri),
+      url: masterPlaylistUrl ? createPlaylistUrl(masterPlaylistUrl, uri) : uri,
     })) || []
   );
 }
