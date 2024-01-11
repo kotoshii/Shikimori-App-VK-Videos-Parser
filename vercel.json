@@ -12,5 +12,6 @@
             "src": "/(.*)",
             "dest": "dist/app.js"
         }
-    ]
+    ],
+    "regions": ["fra1"]
 }
