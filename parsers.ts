@@ -27,8 +27,8 @@ export async function parseSovetRomanticaPlaylistsExample(
   masterPlaylistUrl: string,
 ) {
   try {
-    const res = await axios.get<string>(masterPlaylistUrl);
-    const manifest = getPlaylistManifest(res.data);
+    const masterPlaylistData = await axios.get<string>(masterPlaylistUrl);
+    const manifest = getPlaylistManifest(masterPlaylistData.data);
 
     return getPlaylistsFromManifest(manifest, masterPlaylistUrl).reverse();
   } catch (e) {
@@ -61,6 +61,33 @@ async function parseDzenPlaylists(embedUrl: string) {
     return getPlaylistsFromManifest(manifest, masterPlaylistUrl)
       .filter(({ url }) => !url.includes("redundant"))
       .reverse();
+  } catch (e) {
+    return [];
+  }
+}
+
+async function parseNuumPlaylists(embedUrl: string) {
+  try {
+    const videoId = new URL(embedUrl).pathname
+      .replace(/\/+$/, "")
+      .split("/")
+      .pop();
+
+    const apiRes = await axios.get(
+      `https://nuum.ru/api/v2/media-containers/${videoId}`,
+    );
+
+    const _findMediaMeta = ({ media_meta }) =>
+      media_meta?.media_archive_url?.includes("master.m3u8");
+
+    const masterPlaylistUrl = apiRes.data?.result?.media_container_streams
+      ?.find(({ stream_media }) => stream_media?.find(_findMediaMeta))
+      ?.stream_media?.find(_findMediaMeta)?.media_meta?.media_archive_url;
+
+    const masterPlaylistData = await axios.get(masterPlaylistUrl);
+    const manifest = getPlaylistManifest(masterPlaylistData.data);
+
+    return getPlaylistsFromManifest(manifest).reverse();
   } catch (e) {
     return [];
   }
