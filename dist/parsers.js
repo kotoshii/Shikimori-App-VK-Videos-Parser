@@ -8,12 +8,17 @@ const axios_1 = __importDefault(require("axios"));
 const utils_1 = require("./utils");
 const node_html_parser_1 = __importDefault(require("node-html-parser"));
 async function parseSovetRomanticaPlaylists(playlistUrl) {
-    const res = await axios_1.default.get(playlistUrl);
-    const manifest = (0, utils_1.getPlaylistManifest)(res.data);
-    return (0, utils_1.getPlaylistsFromManifest)(manifest, playlistUrl).reduce((acc, { quality, url }) => ({
-        ...acc,
-        [`src_${quality}`]: url,
-    }), {});
+    try {
+        const res = await axios_1.default.get(playlistUrl);
+        const manifest = (0, utils_1.getPlaylistManifest)(res.data);
+        return (0, utils_1.getPlaylistsFromManifest)(manifest, playlistUrl).reduce((acc, { quality, url }) => ({
+            ...acc,
+            [`src_${quality}`]: url,
+        }), {});
+    }
+    catch (e) {
+        return {};
+    }
 }
 exports.parseSovetRomanticaPlaylists = parseSovetRomanticaPlaylists;
 async function parseSovetRomanticaPlaylistsExample(masterPlaylistUrl) {
@@ -28,7 +33,7 @@ async function parseSovetRomanticaPlaylistsExample(masterPlaylistUrl) {
 }
 exports.parseSovetRomanticaPlaylistsExample = parseSovetRomanticaPlaylistsExample;
 // returns a list of Tracks: `[{quality: '1080', url: '...'}]`
-async function parseDzenStreams(embedUrl) {
+async function parseDzenPlaylists(embedUrl) {
     try {
         const htmlRes = await axios_1.default.get(embedUrl);
         const doc = (0, node_html_parser_1.default)(htmlRes.data);

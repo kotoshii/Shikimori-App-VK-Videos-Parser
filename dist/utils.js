@@ -25,15 +25,10 @@ function createPlaylistUrl(masterPlaylistUrl, fragmentUri) {
 }
 exports.createPlaylistUrl = createPlaylistUrl;
 function getPlaylistsFromManifest(manifest, masterPlaylistUrl) {
-    try {
-        return (manifest?.playlists?.map(({ attributes, uri }) => ({
-            quality: attributes.RESOLUTION.height.toString(),
-            url: createPlaylistUrl(masterPlaylistUrl, uri),
-        })) || []);
-    }
-    catch (e) {
-        return [];
-    }
+    return (manifest?.playlists?.map(({ attributes, uri }) => ({
+        quality: attributes.RESOLUTION.height.toString(),
+        url: createPlaylistUrl(masterPlaylistUrl, uri),
+    })) || []);
 }
 exports.getPlaylistsFromManifest = getPlaylistsFromManifest;
 function getPlaylistManifest(masterPlaylistData) {

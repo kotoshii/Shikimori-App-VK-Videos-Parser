@@ -7,16 +7,20 @@ import {
 import parse from "node-html-parser";
 
 export async function parseSovetRomanticaPlaylists(playlistUrl: string) {
-  const res = await axios.get<string>(playlistUrl);
-  const manifest = getPlaylistManifest(res.data);
+  try {
+    const res = await axios.get<string>(playlistUrl);
+    const manifest = getPlaylistManifest(res.data);
 
-  return getPlaylistsFromManifest(manifest, playlistUrl).reduce(
-    (acc, { quality, url }) => ({
-      ...acc,
-      [`src_${quality}`]: url,
-    }),
-    {},
-  );
+    return getPlaylistsFromManifest(manifest, playlistUrl).reduce(
+      (acc, { quality, url }) => ({
+        ...acc,
+        [`src_${quality}`]: url,
+      }),
+      {},
+    );
+  } catch (e) {
+    return {};
+  }
 }
 
 export async function parseSovetRomanticaPlaylistsExample(
@@ -33,7 +37,7 @@ export async function parseSovetRomanticaPlaylistsExample(
 }
 
 // returns a list of Tracks: `[{quality: '1080', url: '...'}]`
-async function parseDzenStreams(embedUrl: string) {
+async function parseDzenPlaylists(embedUrl: string) {
   try {
     const htmlRes = await axios.get(embedUrl);
     const doc = parse(htmlRes.data);

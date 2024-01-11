@@ -36,16 +36,12 @@ export function getPlaylistsFromManifest(
   manifest: any,
   masterPlaylistUrl: string,
 ) {
-  try {
-    return (
-      manifest?.playlists?.map(({ attributes, uri }) => ({
-        quality: attributes.RESOLUTION.height.toString(),
-        url: createPlaylistUrl(masterPlaylistUrl, uri),
-      })) || []
-    );
-  } catch (e) {
-    return [];
-  }
+  return (
+    manifest?.playlists?.map(({ attributes, uri }) => ({
+      quality: attributes.RESOLUTION.height.toString(),
+      url: createPlaylistUrl(masterPlaylistUrl, uri),
+    })) || []
+  );
 }
 
 export function getPlaylistManifest(masterPlaylistData: string) {
