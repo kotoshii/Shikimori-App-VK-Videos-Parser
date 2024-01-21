@@ -66,3 +66,9 @@ export function createTrack(quality: string, url: string): Track {
     url,
   };
 }
+
+export function sortTracks(tracks: Track[]) {
+  return tracks.sort((a, b) =>
+    a.quality === "unknown" ? -1 : Number(b.quality) - Number(a.quality),
+  );
+}

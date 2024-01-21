@@ -4,6 +4,7 @@ import {
   getPlaylistManifest,
   getPlaylistsFromManifest,
   getResByOkQualityName,
+  sortTracks,
   Track,
 } from "./utils";
 import parse from "node-html-parser";
@@ -32,7 +33,7 @@ export async function parseSovetRomanticaPlaylistsExample(
     const masterPlaylistData = await axios.get<string>(masterPlaylistUrl);
     const manifest = getPlaylistManifest(masterPlaylistData.data);
 
-    return getPlaylistsFromManifest(manifest, masterPlaylistUrl).reverse();
+    return sortTracks(getPlaylistsFromManifest(manifest, masterPlaylistUrl));
   } catch (e) {
     return [];
   }
@@ -60,9 +61,11 @@ async function parseDzenPlaylists(embedUrl: string): Promise<Track[]> {
     const masterPlaylistData = await axios.get(masterPlaylistUrl);
     const manifest = getPlaylistManifest(masterPlaylistData.data);
 
-    return getPlaylistsFromManifest(manifest, masterPlaylistUrl)
-      .filter(({ url }) => !url.includes("redundant"))
-      .reverse();
+    return sortTracks(
+      getPlaylistsFromManifest(manifest, masterPlaylistUrl).filter(
+        ({ url }) => !url.includes("redundant"),
+      ),
+    );
   } catch (e) {
     return [];
   }
@@ -89,7 +92,7 @@ async function parseNuumPlaylists(embedUrl: string): Promise<Track[]> {
     const masterPlaylistData = await axios.get(masterPlaylistUrl);
     const manifest = getPlaylistManifest(masterPlaylistData.data);
 
-    return getPlaylistsFromManifest(manifest).reverse();
+    return sortTracks(getPlaylistsFromManifest(manifest));
   } catch (e) {
     return [];
   }
@@ -124,7 +127,7 @@ async function parseAllvideoPlaylists(embedUrl: string): Promise<Track[]> {
       }
     });
 
-    return tracks.reverse();
+    return sortTracks(tracks);
   } catch (e) {
     return [];
   }

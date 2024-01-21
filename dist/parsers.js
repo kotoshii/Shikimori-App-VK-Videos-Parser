@@ -25,7 +25,7 @@ async function parseSovetRomanticaPlaylistsExample(masterPlaylistUrl) {
     try {
         const masterPlaylistData = await axios_1.default.get(masterPlaylistUrl);
         const manifest = (0, utils_1.getPlaylistManifest)(masterPlaylistData.data);
-        return (0, utils_1.getPlaylistsFromManifest)(manifest, masterPlaylistUrl).reverse();
+        return (0, utils_1.sortTracks)((0, utils_1.getPlaylistsFromManifest)(manifest, masterPlaylistUrl));
     }
     catch (e) {
         return [];
@@ -48,9 +48,7 @@ async function parseDzenPlaylists(embedUrl) {
         const masterPlaylistUrl = playerData?.data?.content?.streams?.find(({ url }) => url.includes("master.m3u8"))?.url;
         const masterPlaylistData = await axios_1.default.get(masterPlaylistUrl);
         const manifest = (0, utils_1.getPlaylistManifest)(masterPlaylistData.data);
-        return (0, utils_1.getPlaylistsFromManifest)(manifest, masterPlaylistUrl)
-            .filter(({ url }) => !url.includes("redundant"))
-            .reverse();
+        return (0, utils_1.sortTracks)((0, utils_1.getPlaylistsFromManifest)(manifest, masterPlaylistUrl).filter(({ url }) => !url.includes("redundant")));
     }
     catch (e) {
         return [];
@@ -69,7 +67,7 @@ async function parseNuumPlaylists(embedUrl) {
             ?.stream_media?.find(_findMediaMeta)?.media_meta?.media_archive_url;
         const masterPlaylistData = await axios_1.default.get(masterPlaylistUrl);
         const manifest = (0, utils_1.getPlaylistManifest)(masterPlaylistData.data);
-        return (0, utils_1.getPlaylistsFromManifest)(manifest).reverse();
+        return (0, utils_1.sortTracks)((0, utils_1.getPlaylistsFromManifest)(manifest));
     }
     catch (e) {
         return [];
@@ -97,7 +95,7 @@ async function parseAllvideoPlaylists(embedUrl) {
                 tracks.push((0, utils_1.createTrack)("unknown", el));
             }
         });
-        return tracks.reverse();
+        return (0, utils_1.sortTracks)(tracks);
     }
     catch (e) {
         return [];
