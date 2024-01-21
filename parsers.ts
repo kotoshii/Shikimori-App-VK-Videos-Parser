@@ -6,6 +6,7 @@ import {
   getResByOkQualityName,
   sortTracks,
   Track,
+  UNKNOWN_QUALITY,
 } from "./utils";
 import parse from "node-html-parser";
 
@@ -123,7 +124,7 @@ async function parseAllvideoPlaylists(embedUrl: string): Promise<Track[]> {
       if (match) {
         tracks.push(createTrack(match[1], match[2]));
       } else {
-        tracks.push(createTrack("unknown", el));
+        tracks.push(createTrack(UNKNOWN_QUALITY, el));
       }
     });
 
@@ -145,7 +146,7 @@ async function parseAnimejoyPlaylists(embedUrl: string): Promise<Track[]> {
       if (match) {
         return createTrack(match[1], match[2]);
       } else {
-        return createTrack("unknown", el);
+        return createTrack(UNKNOWN_QUALITY, el);
       }
     });
 
@@ -183,7 +184,7 @@ async function parseMyviPlaylists(embedUrl: string): Promise<Track[]> {
         .replace("%3d", "="),
     );
 
-    return [createTrack("unknown", url)];
+    return [createTrack(UNKNOWN_QUALITY, url)];
   } catch (e) {
     return [];
   }

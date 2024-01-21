@@ -92,7 +92,7 @@ async function parseAllvideoPlaylists(embedUrl) {
                 tracks.push((0, utils_1.createTrack)(match[1], match[2]));
             }
             else {
-                tracks.push((0, utils_1.createTrack)("unknown", el));
+                tracks.push((0, utils_1.createTrack)(utils_1.UNKNOWN_QUALITY, el));
             }
         });
         return (0, utils_1.sortTracks)(tracks);
@@ -111,7 +111,7 @@ async function parseAnimejoyPlaylists(embedUrl) {
                 return (0, utils_1.createTrack)(match[1], match[2]);
             }
             else {
-                return (0, utils_1.createTrack)("unknown", el);
+                return (0, utils_1.createTrack)(utils_1.UNKNOWN_QUALITY, el);
             }
         });
         return (0, utils_1.sortTracks)(tracks);
@@ -137,7 +137,7 @@ async function parseMyviPlaylists(embedUrl) {
             .replace("%2f", "/")
             .replace("%3f", "?")
             .replace("%3d", "="));
-        return [(0, utils_1.createTrack)("unknown", url)];
+        return [(0, utils_1.createTrack)(utils_1.UNKNOWN_QUALITY, url)];
     }
     catch (e) {
         return [];

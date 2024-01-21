@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sortTracks = exports.createTrack = exports.getPlaylistManifest = exports.getPlaylistsFromManifest = exports.createPlaylistUrl = exports.getResByOkQualityName = void 0;
+exports.sortTracks = exports.createTrack = exports.getPlaylistManifest = exports.getPlaylistsFromManifest = exports.createPlaylistUrl = exports.getResByOkQualityName = exports.UNKNOWN_QUALITY = void 0;
 const m3u8Parser = require("m3u8-parser");
+exports.UNKNOWN_QUALITY = "unknown";
 const OkResQuality = {
     mobile: "144",
     lowest: "240",
@@ -43,6 +44,6 @@ function createTrack(quality, url) {
 }
 exports.createTrack = createTrack;
 function sortTracks(tracks) {
-    return tracks.sort((a, b) => a.quality === "unknown" ? -1 : Number(b.quality) - Number(a.quality));
+    return tracks.sort((a, b) => a.quality === exports.UNKNOWN_QUALITY ? -1 : Number(b.quality) - Number(a.quality));
 }
 exports.sortTracks = sortTracks;

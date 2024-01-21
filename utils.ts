@@ -10,6 +10,8 @@ export interface Track {
   url: string;
 }
 
+export const UNKNOWN_QUALITY = "unknown";
+
 const OkResQuality: OkResQualityMap = {
   mobile: "144",
   lowest: "240",
@@ -69,6 +71,6 @@ export function createTrack(quality: string, url: string): Track {
 
 export function sortTracks(tracks: Track[]) {
   return tracks.sort((a, b) =>
-    a.quality === "unknown" ? -1 : Number(b.quality) - Number(a.quality),
+    a.quality === UNKNOWN_QUALITY ? -1 : Number(b.quality) - Number(a.quality),
   );
 }
