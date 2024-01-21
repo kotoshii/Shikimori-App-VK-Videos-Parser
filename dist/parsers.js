@@ -101,6 +101,25 @@ async function parseAllvideoPlaylists(embedUrl) {
         return [];
     }
 }
+async function parseAnimejoyPlaylists(embedUrl) {
+    try {
+        const url = new URL(embedUrl.startsWith("http") ? embedUrl : `https:${embedUrl}`);
+        const links = url.searchParams.get("file")?.split(",") || [];
+        const tracks = links.map((el) => {
+            const match = el.match(/\[(\d+)p\](.+)/);
+            if (match) {
+                return (0, utils_1.createTrack)(match[1], match[2]);
+            }
+            else {
+                return (0, utils_1.createTrack)("unknown", el);
+            }
+        });
+        return (0, utils_1.sortTracks)(tracks);
+    }
+    catch (e) {
+        return [];
+    }
+}
 /* @deprecated */
 async function parseOkPlaylists(playerUrl) {
     const res = await axios_1.default.get(playerUrl);

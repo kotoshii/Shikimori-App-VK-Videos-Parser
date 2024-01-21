@@ -133,6 +133,28 @@ async function parseAllvideoPlaylists(embedUrl: string): Promise<Track[]> {
   }
 }
 
+async function parseAnimejoyPlaylists(embedUrl: string): Promise<Track[]> {
+  try {
+    const url = new URL(
+      embedUrl.startsWith("http") ? embedUrl : `https:${embedUrl}`,
+    );
+    const links = url.searchParams.get("file")?.split(",") || [];
+
+    const tracks: Track[] = links.map<Track>((el) => {
+      const match = el.match(/\[(\d+)p\](.+)/);
+      if (match) {
+        return createTrack(match[1], match[2]);
+      } else {
+        return createTrack("unknown", el);
+      }
+    });
+
+    return sortTracks(tracks);
+  } catch (e) {
+    return [];
+  }
+}
+
 /* @deprecated */
 export async function parseOkPlaylists(playerUrl: string) {
   const res = await axios.get<string>(playerUrl);
