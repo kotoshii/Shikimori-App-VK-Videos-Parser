@@ -120,6 +120,29 @@ async function parseAnimejoyPlaylists(embedUrl) {
         return [];
     }
 }
+async function parseMyviPlaylists(embedUrl) {
+    const substringAfter = (original, delimiter) => original.slice(original.indexOf(delimiter) + delimiter.length);
+    const substringBefore = (original, delimiter) => original.slice(0, original.indexOf(delimiter));
+    try {
+        const res = await axios_1.default.get(embedUrl);
+        const doc = (0, node_html_parser_1.default)(res.data);
+        const script = doc
+            .querySelectorAll("script")
+            .find((el) => el.innerText.includes('CreatePlayer("v'));
+        if (!script)
+            return [];
+        const url = decodeURIComponent(substringBefore(substringAfter(script?.innerText.replace("\n", "").trim(), '"v='), "\\u0026tp=video")
+            .replace("%26", "&")
+            .replace("%3a", ":")
+            .replace("%2f", "/")
+            .replace("%3f", "?")
+            .replace("%3d", "="));
+        return [(0, utils_1.createTrack)("unknown", url)];
+    }
+    catch (e) {
+        return [];
+    }
+}
 /* @deprecated */
 async function parseOkPlaylists(playerUrl) {
     const res = await axios_1.default.get(playerUrl);

@@ -155,6 +155,40 @@ async function parseAnimejoyPlaylists(embedUrl: string): Promise<Track[]> {
   }
 }
 
+async function parseMyviPlaylists(embedUrl: string): Promise<Track[]> {
+  const substringAfter = (original: string, delimiter: string) =>
+    original.slice(original.indexOf(delimiter) + delimiter.length);
+
+  const substringBefore = (original: string, delimiter: string) =>
+    original.slice(0, original.indexOf(delimiter));
+
+  try {
+    const res = await axios.get(embedUrl);
+    const doc = parse(res.data);
+    const script = doc
+      .querySelectorAll("script")
+      .find((el) => el.innerText.includes('CreatePlayer("v'));
+
+    if (!script) return [];
+
+    const url = decodeURIComponent(
+      substringBefore(
+        substringAfter(script?.innerText.replace("\n", "").trim(), '"v='),
+        "\\u0026tp=video",
+      )
+        .replace("%26", "&")
+        .replace("%3a", ":")
+        .replace("%2f", "/")
+        .replace("%3f", "?")
+        .replace("%3d", "="),
+    );
+
+    return [createTrack("unknown", url)];
+  } catch (e) {
+    return [];
+  }
+}
+
 /* @deprecated */
 export async function parseOkPlaylists(playerUrl: string) {
   const res = await axios.get<string>(playerUrl);
