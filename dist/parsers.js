@@ -75,6 +75,42 @@ async function parseNuumPlaylists(embedUrl) {
         return [];
     }
 }
+async function parseAllvideoPlaylists(embedUrl) {
+    try {
+        const htmlRes = await axios_1.default.get(embedUrl);
+        const doc = (0, node_html_parser_1.default)(htmlRes.data);
+        const script = doc
+            .querySelectorAll("script")
+            .find((el) => el.innerText.includes("isMobile") && el.innerText.includes("file:"));
+        if (!script)
+            return [];
+        const match = script.innerText.match(/file:\"(.+)\"/);
+        if (!match)
+            return [];
+        const tracks = [];
+        match[1].split(",").forEach((el) => {
+            const match = el.match(/\[(\d+)p\](.+)/);
+            if (match) {
+                // @ts-ignore
+                tracks.push({
+                    quality: match[1],
+                    url: match[2],
+                });
+            }
+            else {
+                // @ts-ignore
+                tracks.push({
+                    quality: "unknown",
+                    url: el,
+                });
+            }
+        });
+        return tracks.reverse();
+    }
+    catch (e) {
+        return [];
+    }
+}
 /* @deprecated */
 async function parseOkPlaylists(playerUrl) {
     const res = await axios_1.default.get(playerUrl);
