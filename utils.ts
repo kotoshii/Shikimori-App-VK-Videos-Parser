@@ -5,6 +5,11 @@ type ResQuality = "144" | "240" | "360" | "480" | "720" | "1080";
 
 type OkResQualityMap = Record<OkQuality, ResQuality>;
 
+export interface Track {
+  quality: string;
+  url: string;
+}
+
 const OkResQuality: OkResQualityMap = {
   mobile: "144",
   lowest: "240",
@@ -35,12 +40,14 @@ export function createPlaylistUrl(
 export function getPlaylistsFromManifest(
   manifest: any,
   masterPlaylistUrl?: string,
-) {
+): Track[] {
   return (
-    manifest?.playlists?.map(({ attributes, uri }) => ({
-      quality: attributes.RESOLUTION.height.toString(),
-      url: masterPlaylistUrl ? createPlaylistUrl(masterPlaylistUrl, uri) : uri,
-    })) || []
+    manifest?.playlists?.map(({ attributes, uri }) =>
+      createTrack(
+        attributes.RESOLUTION.height.toString(),
+        masterPlaylistUrl ? createPlaylistUrl(masterPlaylistUrl, uri) : uri,
+      ),
+    ) || []
   );
 }
 
@@ -51,4 +58,11 @@ export function getPlaylistManifest(masterPlaylistData: string) {
   parser.end();
 
   return parser.manifest;
+}
+
+export function createTrack(quality: string, url: string): Track {
+  return {
+    quality,
+    url,
+  };
 }

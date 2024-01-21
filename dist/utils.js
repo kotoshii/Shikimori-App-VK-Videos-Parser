@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPlaylistManifest = exports.getPlaylistsFromManifest = exports.createPlaylistUrl = exports.getResByOkQualityName = void 0;
+exports.createTrack = exports.getPlaylistManifest = exports.getPlaylistsFromManifest = exports.createPlaylistUrl = exports.getResByOkQualityName = void 0;
 const m3u8Parser = require("m3u8-parser");
 const OkResQuality = {
     mobile: "144",
@@ -25,10 +25,7 @@ function createPlaylistUrl(masterPlaylistUrl, fragmentUri) {
 }
 exports.createPlaylistUrl = createPlaylistUrl;
 function getPlaylistsFromManifest(manifest, masterPlaylistUrl) {
-    return (manifest?.playlists?.map(({ attributes, uri }) => ({
-        quality: attributes.RESOLUTION.height.toString(),
-        url: masterPlaylistUrl ? createPlaylistUrl(masterPlaylistUrl, uri) : uri,
-    })) || []);
+    return (manifest?.playlists?.map(({ attributes, uri }) => createTrack(attributes.RESOLUTION.height.toString(), masterPlaylistUrl ? createPlaylistUrl(masterPlaylistUrl, uri) : uri)) || []);
 }
 exports.getPlaylistsFromManifest = getPlaylistsFromManifest;
 function getPlaylistManifest(masterPlaylistData) {
@@ -38,3 +35,10 @@ function getPlaylistManifest(masterPlaylistData) {
     return parser.manifest;
 }
 exports.getPlaylistManifest = getPlaylistManifest;
+function createTrack(quality, url) {
+    return {
+        quality,
+        url,
+    };
+}
+exports.createTrack = createTrack;

@@ -1,8 +1,10 @@
 import axios from "axios";
 import {
+  createTrack,
   getPlaylistManifest,
   getPlaylistsFromManifest,
   getResByOkQualityName,
+  Track,
 } from "./utils";
 import parse from "node-html-parser";
 
@@ -25,7 +27,7 @@ export async function parseSovetRomanticaPlaylists(playlistUrl: string) {
 
 export async function parseSovetRomanticaPlaylistsExample(
   masterPlaylistUrl: string,
-) {
+): Promise<Track[]> {
   try {
     const masterPlaylistData = await axios.get<string>(masterPlaylistUrl);
     const manifest = getPlaylistManifest(masterPlaylistData.data);
@@ -37,7 +39,7 @@ export async function parseSovetRomanticaPlaylistsExample(
 }
 
 // returns a list of Tracks: `[{quality: '1080', url: '...'}]`
-async function parseDzenPlaylists(embedUrl: string) {
+async function parseDzenPlaylists(embedUrl: string): Promise<Track[]> {
   try {
     const htmlRes = await axios.get(embedUrl);
     const doc = parse(htmlRes.data);
@@ -66,7 +68,7 @@ async function parseDzenPlaylists(embedUrl: string) {
   }
 }
 
-async function parseNuumPlaylists(embedUrl: string) {
+async function parseNuumPlaylists(embedUrl: string): Promise<Track[]> {
   try {
     const videoId = new URL(embedUrl).pathname
       .replace(/\/+$/, "")
@@ -93,7 +95,7 @@ async function parseNuumPlaylists(embedUrl: string) {
   }
 }
 
-async function parseAllvideoPlaylists(embedUrl: string) {
+async function parseAllvideoPlaylists(embedUrl: string): Promise<Track[]> {
   try {
     const htmlRes = await axios.get(embedUrl);
     const doc = parse(htmlRes.data);
@@ -111,22 +113,14 @@ async function parseAllvideoPlaylists(embedUrl: string) {
 
     if (!match) return [];
 
-    const tracks = [];
+    const tracks: Track[] = [];
 
     match[1].split(",").forEach((el) => {
       const match = el.match(/\[(\d+)p\](.+)/);
       if (match) {
-        // @ts-ignore
-        tracks.push({
-          quality: match[1],
-          url: match[2],
-        });
+        tracks.push(createTrack(match[1], match[2]));
       } else {
-        // @ts-ignore
-        tracks.push({
-          quality: "unknown",
-          url: el,
-        });
+        tracks.push(createTrack("unknown", el));
       }
     });
 
@@ -151,10 +145,7 @@ export async function parseOkPlaylists(playerUrl: string) {
     ).videos;
 
     return links
-      .map(({ name, url }) => ({
-        quality: getResByOkQualityName(name),
-        url,
-      }))
+      .map(({ name, url }) => createTrack(getResByOkQualityName(name), url))
       .reverse();
   } catch (e) {
     return [];

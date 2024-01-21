@@ -91,18 +91,10 @@ async function parseAllvideoPlaylists(embedUrl) {
         match[1].split(",").forEach((el) => {
             const match = el.match(/\[(\d+)p\](.+)/);
             if (match) {
-                // @ts-ignore
-                tracks.push({
-                    quality: match[1],
-                    url: match[2],
-                });
+                tracks.push((0, utils_1.createTrack)(match[1], match[2]));
             }
             else {
-                // @ts-ignore
-                tracks.push({
-                    quality: "unknown",
-                    url: el,
-                });
+                tracks.push((0, utils_1.createTrack)("unknown", el));
             }
         });
         return tracks.reverse();
@@ -120,10 +112,7 @@ async function parseOkPlaylists(playerUrl) {
             .querySelector('[data-module="OKVideo"]')
             ?.getAttribute("data-options")).flashvars.metadata).videos;
         return links
-            .map(({ name, url }) => ({
-            quality: (0, utils_1.getResByOkQualityName)(name),
-            url,
-        }))
+            .map(({ name, url }) => (0, utils_1.createTrack)((0, utils_1.getResByOkQualityName)(name), url))
             .reverse();
     }
     catch (e) {
